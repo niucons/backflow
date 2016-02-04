@@ -1,4 +1,5 @@
 Imports System.Data.SqlClient
+Imports System.Configuration
 Imports System.Text.RegularExpressions
 
 Public Class AssemblyAddForm
@@ -294,7 +295,7 @@ Public Class AssemblyAddForm
 #End Region
 
     Public Shared propNumber As Integer
-    Protected connectionString As String = Connection.SQL_CONNECTION_STRING
+    Protected connectionString As String = ConfigurationManager.ConnectionStrings("bftm.My.MySettings.qbConnectionString1").ConnectionString
 
     ' Handle the Form load event.
     Private Sub AssemAdd_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles MyBase.Load

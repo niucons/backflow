@@ -1,4 +1,5 @@
 Imports System.Data.SqlClient
+Imports System.Configuration
 
 Public Class ManagerDateChooserForm
     Inherits System.Windows.Forms.Form
@@ -163,7 +164,7 @@ Public Class ManagerDateChooserForm
 
 #End Region
 
-    Protected connectionString As String = Connection.SQL_CONNECTION_STRING
+    Protected connectionString As String = ConfigurationManager.ConnectionStrings("bftm.My.MySettings.qbConnectionString1").ConnectionString
 
     Private Sub btnOK_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnOK.Click
         Dim StartDate As Date = dtpStart.Value.Date

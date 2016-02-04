@@ -1,3 +1,4 @@
+Imports System.Configuration
 Imports System.Data.SqlClient
 Imports System.Text.RegularExpressions
 
@@ -353,7 +354,7 @@ Public Class PropertyAddForm
 #End Region
 
     Public Shared manNumber As Integer ' Set through MainForm
-    Protected connectionString As String = Connection.SQL_CONNECTION_STRING
+    Protected connectionString As String = ConfigurationManager.ConnectionStrings("bftm.My.MySettings.qbConnectionString1").ConnectionString
 
 
     ' Handle the Form load event.

@@ -1,3 +1,4 @@
+Imports System.Configuration
 Imports System.Data.SqlClient
 Imports System.Text.RegularExpressions
 
@@ -320,7 +321,7 @@ Public Class AssemblyDetailForm
 #End Region
 
     Public Shared assemblyNumber As Integer
-    Protected connectionString As String = Connection.SQL_CONNECTION_STRING
+    Protected connectionString As String = ConfigurationManager.ConnectionStrings("bftm.My.MySettings.qbConnectionString1").ConnectionString
     Private strSerial As String
     Private Type As String
     Private Manufacturer As String

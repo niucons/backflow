@@ -1,3 +1,4 @@
+Imports System.Configuration
 Imports System.Data
 Imports System.Data.SqlClient
 Imports System.Text.RegularExpressions
@@ -467,7 +468,7 @@ Public Class frmManDetails
 
     Private PricingScheme As Integer
     Private MaxSchemeNo As Integer
-    Protected connectionString As String = Connection.SQL_CONNECTION_STRING
+    Protected connectionString As String = ConfigurationManager.ConnectionStrings("bftm.My.MySettings.qbConnectionString1").ConnectionString
     Dim logoPath As String = ""
 
     ' Handle the Form load event.

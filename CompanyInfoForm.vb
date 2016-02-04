@@ -1,8 +1,11 @@
+Imports System.Configuration
 Imports System.Data.SqlClient
 Imports System.Text.RegularExpressions
 
 Public Class CompanyInfoForm
-    Protected connectionString As String = Connection.SQL_CONNECTION_STRING
+    Protected connectionString As String = ConfigurationManager.ConnectionStrings("bftm.My.MySettings.qbConnectionString1").ConnectionString
+
+
 
     Private Sub CompanyInfoForm_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles MyBase.Load
 

@@ -1,3 +1,4 @@
+Imports System.Configuration
 Imports System.Data
 Imports System.Data.SqlClient
 Imports System.Text.RegularExpressions
@@ -366,7 +367,7 @@ Public Class MunicipalityForm
     Private municipalityNo As Integer
     Dim mode As String = "update"
 
-    Protected connectionString As String = Connection.SQL_CONNECTION_STRING
+    Protected connectionString As String = ConfigurationManager.ConnectionStrings("bftm.My.MySettings.qbConnectionString1").ConnectionString
     ' Handle the Form load event.
     Private Sub frmMun_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles MyBase.Load
         PopulateMunicipalityList()

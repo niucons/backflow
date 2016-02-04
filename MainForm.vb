@@ -1,6 +1,10 @@
+Imports System.Configuration
 Imports System.Data
 Imports System.Data.SqlClient
 Imports BackflowTestingManager.CSharp
+Imports log4net
+
+
 
 
 
@@ -141,6 +145,7 @@ Public Class MainForm
         Me.mnuRetestLetters = New System.Windows.Forms.MenuItem()
         Me.mnuTestReports = New System.Windows.Forms.MenuItem()
         Me.mnuTestsByManager = New System.Windows.Forms.MenuItem()
+        Me.mnuManagerTest = New System.Windows.Forms.MenuItem()
         Me.mnuTestsByMunicipality = New System.Windows.Forms.MenuItem()
         Me.MenuItem10 = New System.Windows.Forms.MenuItem()
         Me.mnuTopManagers = New System.Windows.Forms.MenuItem()
@@ -176,7 +181,6 @@ Public Class MainForm
         Me.SplitContainer1 = New System.Windows.Forms.SplitContainer()
         Me.MonthCalendar1 = New System.Windows.Forms.MonthCalendar()
         Me.btnPostToAccounting = New System.Windows.Forms.Button()
-        Me.mnuManagerTest = New System.Windows.Forms.MenuItem()
         Me.grpDetails.SuspendLayout()
         CType(Me.grdTests, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -379,6 +383,11 @@ Public Class MainForm
         '
         Me.mnuTestsByManager.Index = 5
         Me.mnuTestsByManager.Text = "Tests By Manager"
+        '
+        'mnuManagerTest
+        '
+        Me.mnuManagerTest.Index = 6
+        Me.mnuManagerTest.Text = "Manager Test"
         '
         'mnuTestsByMunicipality
         '
@@ -654,19 +663,14 @@ Public Class MainForm
         Me.btnPostToAccounting.Text = "Post to Accounting"
         Me.btnPostToAccounting.UseVisualStyleBackColor = True
         '
-        'mnuManagerTest
-        '
-        Me.mnuManagerTest.Index = 6
-        Me.mnuManagerTest.Text = "Manager Test"
-        '
         'MainForm
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
         Me.ClientSize = New System.Drawing.Size(1012, 669)
         Me.ContextMenu = Me.cmTests
+        Me.Controls.Add(Me.grdTests)
         Me.Controls.Add(Me.btnPostToAccounting)
         Me.Controls.Add(Me.SplitContainer1)
-        Me.Controls.Add(Me.grdTests)
         Me.Controls.Add(Me.grpDetails)
         Me.Controls.Add(Me.ToolBar1)
         Me.Controls.Add(Me.MonthCalendar1)
@@ -689,7 +693,10 @@ Public Class MainForm
 
 #End Region
 
-    Protected connectionString As String = Connection.SQL_CONNECTION_STRING
+
+    Public Shared logger As ILog = Nothing
+
+    Protected connectionString As String
 
     Public Shared ds As DataSet
     Private dtTests As DataTable
@@ -716,48 +723,63 @@ Public Class MainForm
 
     ' Handle the Form load event.
     Private Sub frmMain_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles MyBase.Load
-        ' Fill the DataTables for ComboBoxes
-        FillDataTables()
-        ' Fill the TreeView
-        FillTreeView()
-        RefreshTestList()
-        Me.WindowState() = FormWindowState.Maximized
-        If dvTests.Count > 0 Then
-            mnuDeleteTest.Enabled = True
-        Else
-            mnuDeleteTest.Enabled = False
-        End If
-        mnuPaste.Enabled = False
-        tbbPaste.Enabled = False
+        Try
 
-        TreeView1.Select()
 
+            connectionString = ConfigurationManager.ConnectionStrings("bftm.My.MySettings.qbConnectionString1").ConnectionString
+            logger = LogManager.GetLogger("GeneralLogger")
+            logger.Info("frmMain_Load - Init")
+
+            ' Fill the DataTables for ComboBoxes
+            FillDataTables()
+            ' Fill the TreeView
+            FillTreeView()
+            RefreshTestList()
+            Me.WindowState() = FormWindowState.Maximized
+            If dvTests.Count > 0 Then
+                mnuDeleteTest.Enabled = True
+            Else
+                mnuDeleteTest.Enabled = False
+            End If
+            mnuPaste.Enabled = False
+            tbbPaste.Enabled = False
+
+            TreeView1.Select()
+        Catch ex As Exception
+            MessageBox.Show(ex.ToString)
+
+
+        End Try
     End Sub
 
     Private Sub FillDataTables()
         ' Instantiate the dataset 
         ds = New DataSet ' Create a new dataset
         ' Establish connection object
-        Dim cn As New SqlConnection(connectionString)
-        Dim cmd As New SqlCommand
-        cmd.Connection = cn
-        Dim sda As New SqlDataAdapter(cmd)
+        Try
+            Dim cn As New SqlConnection(connectionString)
+            Dim cmd As New SqlCommand
+            cmd.Connection = cn
+            Dim sda As New SqlDataAdapter(cmd)
 
-        ' Fill the tables for the comboboxes
+            ' Fill the tables for the comboboxes
 
-        ' Reset the CommandText to get the Assembly Sizes
-        cmd.CommandText = "SELECT AssemSize, AssemSizeNo FROM AssemblySizes"
-        sda.Fill(ds, "AssemSizes") ' Fill Assembly Sizes datatable
-        ' Reset the CommandText to get the Municipality
-        cmd.CommandText = "SELECT munNo, munName FROM Municipalities ORDER BY munName"
-        sda.Fill(ds, "Municip") ' Fill the Municipalities datatable
-        cmd.CommandText = "SELECT tstrName, tstrNo FROM Testers"
-        sda.Fill(ds, "Testers") ' Fill the Testers datatable.
-
+            ' Reset the CommandText to get the Assembly Sizes
+            cmd.CommandText = "SELECT AssemSize, AssemSizeNo FROM AssemblySizes"
+            sda.Fill(ds, "AssemSizes") ' Fill Assembly Sizes datatable
+            ' Reset the CommandText to get the Municipality
+            cmd.CommandText = "SELECT munNo, munName FROM Municipalities ORDER BY munName"
+            sda.Fill(ds, "Municip") ' Fill the Municipalities datatable
+            cmd.CommandText = "SELECT tstrName, tstrNo FROM Testers"
+            sda.Fill(ds, "Testers") ' Fill the Testers datatable.
+        Catch ex As Exception
+            Throw ex
+        End Try
     End Sub
 
     Private Sub FillTreeView()
         ' Create a New SQL Connection
+        logger.Info("FillTreeView - Enter")
         Dim cn As New SqlConnection(connectionString)
         ' Query which returns a resultset like the following
         ' Managers No., Manager's Name, Property No., Property's Name, Assembly No., Assembly's Serial No.
@@ -840,10 +862,12 @@ Public Class MainForm
                 msg = "Message = " & sqlErr.Message & ControlChars.CrLf
                 msg &= "Source = " & sqlErr.Source & ControlChars.CrLf
             Next
+            logger.Error(ex.ToString(), ex)
             MessageBox.Show(msg)
 
         Catch ex As Exception
             ' A generic exception has occured
+            logger.Error(ex.ToString(), ex)
             MessageBox.Show(ex.Message)
         Finally
             ' Close the connection
@@ -856,7 +880,7 @@ Public Class MainForm
         ' Begin repainting the TreeView.
         TreeView1.EndUpdate()
 
-
+        logger.Info("FillTreeView - Exit")
     End Sub 'FillTreeView
 
 
@@ -2220,6 +2244,8 @@ Public Class MainForm
 
     Private Sub UpdateTests()
 
+        logger.Debug("UpdateTests - Entered")
+
         Dim index As Integer
         Dim lookUp As Integer
         Dim Performed As Boolean
@@ -2230,9 +2256,8 @@ Public Class MainForm
         Dim PO As String
         Dim Notes As String
         Dim Post As Boolean
-        Dim WasPosted As Boolean
         Dim Max As Integer = dtTests.Rows.Count - 1
-        Dim str As String
+        Dim msg As String
 
         Dim cn As New SqlConnection(connectionString)
         Dim cmd As New SqlCommand
@@ -2276,22 +2301,24 @@ Public Class MainForm
             Next
         Catch ex As SqlException
             'A SqlException has occured - display details
-            Dim i As Integer, msg As String
+            Dim i As Integer
             For i = 0 To ex.Errors.Count - 1
                 Dim sqlErr As SqlError = ex.Errors(i)
                 msg = "Message = " & sqlErr.Message & ControlChars.CrLf
                 msg &= "Source = " & sqlErr.Source & ControlChars.CrLf
             Next
+            logger.Error(msg, ex)
             ' MessageBox.Show(msg)
 
         Catch ex As Exception
             ' A generic exception has occured
             MessageBox.Show(ex.Message)
+            logger.Error(ex.Message,ex)
         Finally
             ' Close the connection
             cn.Close()
         End Try
-
+        logger.Debug("UpdateTests - Exit")
     End Sub
 
 

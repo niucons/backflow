@@ -1,3 +1,4 @@
+Imports System.Configuration
 Imports System.Data
 Imports System.Data.SqlClient
 Public Class PricingForm
@@ -108,7 +109,7 @@ Public Class PricingForm
     Private dvSchemes As DataView
     Private sda As SqlDataAdapter
 
-    Protected connectionString As String = Connection.SQL_CONNECTION_STRING
+    Protected connectionString As String = ConfigurationManager.ConnectionStrings("bftm.My.MySettings.qbConnectionString1").ConnectionString
 
     ' Handle the Form load event.
     Private Sub frmPricing_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles MyBase.Load

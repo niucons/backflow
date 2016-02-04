@@ -1,3 +1,4 @@
+Imports System.Configuration
 Imports System.Data
 Imports System.Data.SqlClient
 Imports System.Text.RegularExpressions
@@ -456,7 +457,7 @@ Public Class frmManAdd
     Private MaxSchemeNo As Integer
     Private PricingSchemeNo As Integer = 1
     Private logoPath As String = "C:\Program Files\JDR\BackflowTestingManager\logos\Default.png"
-    Protected connectionString As String = Connection.SQL_CONNECTION_STRING
+    Protected connectionString As String = ConfigurationManager.ConnectionStrings("bftm.My.MySettings.qbConnectionString1").ConnectionString
 
 
     Private Sub frmManAdd_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles MyBase.Load

@@ -1,6 +1,7 @@
 Imports System
 Imports System.Reflection
 Imports System.Runtime.InteropServices
+Imports log4net.Config
 
 ' General Information about an assembly is controlled through the following 
 ' set of attributes. Change these attribute values to modify the information
@@ -18,6 +19,7 @@ Imports System.Runtime.InteropServices
 
 'The following GUID is for the ID of the typelib if this project is exposed to COM
 <Assembly: Guid("F6428CE4-6D3F-43C9-9D00-711EF2BA839B")> 
+<Assembly: XmlConfigurator(ConfigFile:="app.config", Watch:=True)> 
 
 ' Version information for an assembly consists of the following four values:
 '
